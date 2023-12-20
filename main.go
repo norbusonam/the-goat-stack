@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io/fs"
 	"os"
 	"os/exec"
 )
@@ -38,6 +39,21 @@ func logHelp() {
 	fmt.Println("  help\t\tShow this help message")
 }
 
+func createProject(pName string, mName string) {
+	// make project directory
+	performStepWithLogging("creating project directory", "project directory created", func() error {
+		return os.Mkdir(pName, fs.ModePerm)
+	})
+	// cd into project directory
+	performStepWithLogging("changing directory", "directory changed", func() error {
+		return os.Chdir(pName)
+	})
+	// create go module
+	performStepWithLogging("creating go module", "go module created", func() error {
+		return exec.Command("go", "mod", "init", mName).Run()
+	})
+}
+
 func main() {
 	fmt.Print("thegoat 🐐\n\n")
 
@@ -49,6 +65,14 @@ func main() {
 
 	switch os.Args[1] {
 	case "new":
+		// get project name and module name
+		fmt.Print("project name: ")
+		var pName string
+		fmt.Scanln(&pName)
+		fmt.Print("module name: ")
+		var mName string
+		fmt.Scanln(&mName)
+		fmt.Println()
 		// check prerequisites
 		fmt.Println("checking prerequisites")
 		checkPreReq("go")
@@ -56,7 +80,9 @@ func main() {
 		checkPreReq("npm")
 		checkPreReq("templ")
 		fmt.Println()
-
+		// create project
+		fmt.Println("creating project")
+		createProject(pName, mName)
 	case "help":
 		logHelp()
 	default:
