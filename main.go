@@ -88,6 +88,4 @@ func main() {
 	default:
 		logErrorAndExit("invalid command")
 	}
-
-	os.Exit(0)
 }
