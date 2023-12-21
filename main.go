@@ -7,7 +7,7 @@ import (
 	"os/exec"
 )
 
-func performStepWithLogging(loadingMsg string, completeMsg string, step func() error) {
+func performStepWithLogging(loadingMsg, completeMsg string, step func() error) {
 	fmt.Println("⌛️ " + loadingMsg)
 	err := step()
 	if err != nil {
@@ -39,7 +39,7 @@ func logHelp() {
 	fmt.Println("  help\t\tShow this help message")
 }
 
-func createProject(pName string, mName string) {
+func createProject(pName, mName string) {
 	// make project directory
 	performStepWithLogging("creating project directory", "project directory created", func() error {
 		return os.Mkdir(pName, fs.ModePerm)
