@@ -71,6 +71,12 @@ func createProject(pName, mName string) {
 	// TODO: create .gitignore
 
 	// TODO: run go mod tidy
+
+	// success message
+	fmt.Println()
+	fmt.Println("🎉 project created successfully")
+	fmt.Println("👉 cd " + pName)
+	fmt.Println("👉 air")
 }
 
 func main() {
