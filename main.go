@@ -109,6 +109,7 @@ func main() {
 		checkPreReq("go")
 		checkPreReq("air")
 		checkPreReq("npm")
+		checkPreReq("npx")
 		checkPreReq("templ")
 		fmt.Println()
 		// create project
