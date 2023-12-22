@@ -91,13 +91,19 @@ func main() {
 	switch os.Args[1] {
 	case "new":
 		// get project name and module name
-		fmt.Print("project name: ")
+		fmt.Print("project name (default: my-project): ")
 		var pName string
 		fmt.Scanln(&pName)
-		fmt.Print("module name: ")
+		if pName == "" {
+			pName = "my-project"
+		}
+		fmt.Print("module name (default my-module): ")
 		var mName string
 		fmt.Scanln(&mName)
 		fmt.Println()
+		if mName == "" {
+			mName = "my-module"
+		}
 		// check prerequisites
 		fmt.Println("checking prerequisites")
 		checkPreReq("go")
