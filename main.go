@@ -52,6 +52,22 @@ func createProject(pName, mName string) {
 	performStepWithLogging("creating go module", "go module created", func() error {
 		return exec.Command("go", "mod", "init", mName).Run()
 	})
+
+	// TODO: create main.go that sets up echo server and serves static files
+
+	// TODO: create pkg/templates w/ index.templ (incl tailwind and htmx)
+
+	// TODO: create pkg/handlers w/ index.go
+
+	// TODO: run templ generate
+
+	// TODO: setup tailwind
+
+	// TODO: setup air
+
+	// TODO: create .gitignore
+
+	// TODO: run go mod tidy
 }
 
 func main() {
