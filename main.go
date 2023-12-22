@@ -64,6 +64,9 @@ func createProject(pName, mName string) {
 	// TODO: setup tailwind
 
 	// TODO: setup air
+	performStepWithLogging("initializing air", "air initialized", func() error {
+		return exec.Command("air", "init").Run()
+	})
 
 	// TODO: create .gitignore
 
