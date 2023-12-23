@@ -8,6 +8,12 @@ import (
 	"strings"
 )
 
+const (
+	major = 0
+	minor = 1
+	patch = 0
+)
+
 func performStepWithLogging(loadingMsg, completeMsg string, step func() error) {
 	fmt.Println("⌛️ " + loadingMsg)
 	err := step()
@@ -31,13 +37,6 @@ func checkPreReq(cmd string) {
 func logErrorAndExit(err string) {
 	fmt.Println("❌ " + err)
 	os.Exit(1)
-}
-
-func logHelp() {
-	fmt.Println("usage: thegoat <command>")
-	fmt.Println("commands:")
-	fmt.Println("  new\t\tCreate a new project")
-	fmt.Println("  help\t\tShow this help message")
 }
 
 func createProject(pName, mName string) {
@@ -274,7 +273,13 @@ func main() {
 		fmt.Println("creating project")
 		createProject(pName, mName)
 	case "help":
-		logHelp()
+		fmt.Println("usage: thegoat <command>")
+		fmt.Println("commands:")
+		fmt.Println("  new\t\tcreate a new project")
+		fmt.Println("  help\t\tshow this help message")
+		fmt.Println("  version\tshow version information")
+	case "version":
+		fmt.Printf("v%d.%d.%d\n", major, minor, patch)
 	default:
 		logErrorAndExit("invalid command")
 	}
