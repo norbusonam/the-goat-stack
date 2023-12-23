@@ -12,7 +12,7 @@ func main() {
 	e.Static("/", "public")
 
 	e.GET("/", func(c echo.Context) error {
-		return templates.Hello("world").Render(c.Request().Context(), c.Response().Writer)
+		return templates.Hello("world 🐐").Render(c.Request().Context(), c.Response().Writer)
 	})
 
 	e.Logger.Fatal(e.Start(":8080"))
