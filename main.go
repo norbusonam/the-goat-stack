@@ -60,7 +60,10 @@ func createProject(pName, mName string) {
 
 	// TODO: create pkg/handlers w/ index.go
 
-	// TODO: run templ generate
+	// run templ generate
+	performStepWithLogging("generating templates", "templates generated", func() error {
+		return exec.Command("templ", "generate").Run()
+	})
 
 	// setup tailwind
 	performStepWithLogging("installing tailwind", "tailwind installed", func() error {
