@@ -110,7 +110,32 @@ func createProject(pName, mName string) {
 		return exec.Command("air", "init").Run()
 	})
 
-	// TODO: configure air
+	// configure air
+	performStepWithLogging("configuring air", "air configured", func() error {
+		f, err := os.ReadFile(".air.toml")
+		if err != nil {
+			return err
+		}
+		fStr := string(f)
+		// find exclude_dir list and append node_modules
+		excludeDirIdx := strings.Index(fStr, "exclude_dir")
+		insertIdx := strings.Index(fStr[excludeDirIdx:], "]")
+		fStr = fStr[:excludeDirIdx+insertIdx] + ", \"node_modules\"" + fStr[excludeDirIdx+insertIdx:]
+		// find exclude_regex list and append _templ.go
+		excludeRegexIdx := strings.Index(fStr, "exclude_regex")
+		insertIdx = strings.Index(fStr[excludeRegexIdx:], "]")
+		fStr = fStr[:excludeRegexIdx+insertIdx] + ", \"_templ.go\"" + fStr[excludeRegexIdx+insertIdx:]
+		// find include_ext list and append .templ
+		includeExtIdx := strings.Index(fStr, "include_ext")
+		insertIdx = strings.Index(fStr[includeExtIdx:], "]")
+		fStr = fStr[:includeExtIdx+insertIdx] + ", \".templ\"" + fStr[includeExtIdx+insertIdx:]
+		// write changes
+		err = os.WriteFile(".air.toml", []byte(fStr), fs.ModePerm)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
 
 	// create .gitignore
 	performStepWithLogging("creating gitignore", "gitignore created", func() error {
