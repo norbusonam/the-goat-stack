@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/labstack/echo/v4"
 	"my-module/pkg/templates"
+
+	"github.com/labstack/echo/v4"
 )
 
 func main() {

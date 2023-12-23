@@ -64,8 +64,9 @@ func createProject(pName, mName string) {
 		mainGoContent := "package main\n"
 		mainGoContent += "\n"
 		mainGoContent += "import (\n"
-		mainGoContent += "\t\"github.com/labstack/echo/v4\"\n"
 		mainGoContent += fmt.Sprintf("\t\"%s/pkg/templates\"\n", mName)
+		mainGoContent += "\n"
+		mainGoContent += "\t\"github.com/labstack/echo/v4\"\n"
 		mainGoContent += ")\n"
 		mainGoContent += "\n"
 		mainGoContent += "func main() {\n"
