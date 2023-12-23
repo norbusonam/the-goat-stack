@@ -40,20 +40,18 @@ func logErrorAndExit(err string) {
 }
 
 func createProject(pName, mName string) {
-	// make project directory
 	performStepWithLogging("creating project directory", "project directory created", func() error {
 		return os.Mkdir(pName, fs.ModePerm)
 	})
-	// cd into project directory
+
 	performStepWithLogging("changing directory", "directory changed", func() error {
 		return os.Chdir(pName)
 	})
-	// create go module
+
 	performStepWithLogging("creating go module", "go module created", func() error {
 		return exec.Command("go", "mod", "init", mName).Run()
 	})
 
-	// create main.go that sets up echo server and serves static files
 	performStepWithLogging("creating main.go", "main.go created", func() error {
 		f, err := os.Create("main.go")
 		if err != nil {
@@ -133,12 +131,10 @@ func createProject(pName, mName string) {
 		return nil
 	})
 
-	// run templ generate
 	performStepWithLogging("generating templates", "templates generated", func() error {
 		return exec.Command("templ", "generate").Run()
 	})
 
-	// setup tailwind
 	performStepWithLogging("installing tailwind", "tailwind installed", func() error {
 		return exec.Command("npm", "install", "-D", "tailwindcss").Run()
 	})
@@ -178,12 +174,10 @@ func createProject(pName, mName string) {
 		return exec.Command("npx", "tailwindcss", "-i", "./input.css", "-o", "./public/tailwind.css", "--minify").Run()
 	})
 
-	// setup air
 	performStepWithLogging("initializing air", "air initialized", func() error {
 		return exec.Command("air", "init").Run()
 	})
 
-	// configure air
 	performStepWithLogging("configuring air", "air configured", func() error {
 		f, err := os.ReadFile(".air.toml")
 		if err != nil {
@@ -210,7 +204,6 @@ func createProject(pName, mName string) {
 		return nil
 	})
 
-	// create .gitignore
 	performStepWithLogging("creating gitignore", "gitignore created", func() error {
 		f, err := os.Create(".gitignore")
 		if err != nil {
@@ -224,12 +217,10 @@ func createProject(pName, mName string) {
 		return nil
 	})
 
-	// run go mod tidy
 	performStepWithLogging("tidying go modules", "go modules tidied", func() error {
 		return exec.Command("go", "mod", "tidy").Run()
 	})
 
-	// success message
 	fmt.Println()
 	fmt.Println("🎉 project created successfully")
 	fmt.Println("👉 cd " + pName)
