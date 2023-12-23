@@ -69,6 +69,18 @@ func createProject(pName, mName string) {
 	})
 
 	// TODO: create .gitignore
+	performStepWithLogging("creating gitignore", "gitignore created", func() error {
+		f, err := os.Create(".gitignore")
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+		_, err = f.WriteString("node_modules/\ntmp/\n*_templ.go\n")
+		if err != nil {
+			return err
+		}
+		return nil
+	})
 
 	// TODO: run go mod tidy
 
