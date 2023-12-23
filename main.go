@@ -54,11 +54,84 @@ func createProject(pName, mName string) {
 		return exec.Command("go", "mod", "init", mName).Run()
 	})
 
-	// TODO: create main.go that sets up echo server and serves static files
+	// create main.go that sets up echo server and serves static files
+	performStepWithLogging("creating main.go", "main.go created", func() error {
+		f, err := os.Create("main.go")
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+		mainGoContent := "package main\n"
+		mainGoContent += "\n"
+		mainGoContent += "import (\n"
+		mainGoContent += "\t\"github.com/labstack/echo/v4\"\n"
+		mainGoContent += fmt.Sprintf("\t\"%s/pkg/templates\"\n", mName)
+		mainGoContent += ")\n"
+		mainGoContent += "\n"
+		mainGoContent += "func main() {\n"
+		mainGoContent += "\te := echo.New()\n"
+		mainGoContent += "\n"
+		mainGoContent += "\te.Static(\"/\", \"public\")\n"
+		mainGoContent += "\n"
+		mainGoContent += "\te.GET(\"/\", func(c echo.Context) error {\n"
+		mainGoContent += "\t\treturn templates.Hello(\"world\").Render(c.Request().Context(), c.Response().Writer)\n"
+		mainGoContent += "\t})\n"
+		mainGoContent += "\n"
+		mainGoContent += "\te.Logger.Fatal(e.Start(\":8080\"))\n"
+		mainGoContent += "}\n"
+		_, err = f.WriteString(mainGoContent)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
 
-	// TODO: create pkg/templates w/ index.templ (incl tailwind and htmx)
+	performStepWithLogging("creating pkg directory", "pkg directory created", func() error {
+		err := os.Mkdir("pkg", fs.ModePerm)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
 
-	// TODO: create pkg/handlers w/ index.go
+	performStepWithLogging("creating templates directory", "templates directory created", func() error {
+		err := os.Mkdir("pkg/templates", fs.ModePerm)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
+	performStepWithLogging("creating index.templ", "index.templ created", func() error {
+		f, err := os.Create("pkg/templates/index.templ")
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+		indexTemplContent := "package templates\n"
+		indexTemplContent += "\n"
+		indexTemplContent += "templ Hello(name string) {\n"
+		indexTemplContent += "\t<!DOCTYPE html>\n"
+		indexTemplContent += "\t<html lang=\"en\">\n"
+		indexTemplContent += "\t\t<head>\n"
+		indexTemplContent += "\t\t\t<meta charset=\"UTF-8\"/>\n"
+		indexTemplContent += "\t\t\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>\n"
+		indexTemplContent += "\t\t\t<title>thegoat 🐐</title>\n"
+		indexTemplContent += "\t\t\t<link rel=\"stylesheet\" href=\"/tailwind.css\"/>\n"
+		indexTemplContent += "\t\t</head>\n"
+		indexTemplContent += "\t\t<body>\n"
+		indexTemplContent += "\t\t\t<div class=\"flex flex-col items-center justify-center h-screen\">\n"
+		indexTemplContent += "\t\t\t\t<h1 class=\"text-4xl font-bold text-gray-800\">Hello, {name}!</h1>\n"
+		indexTemplContent += "\t\t\t</div>\n"
+		indexTemplContent += "\t\t</body>\n"
+		indexTemplContent += "\t</html>\n"
+		indexTemplContent += "}\n"
+		_, err = f.WriteString(indexTemplContent)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
 
 	// run templ generate
 	performStepWithLogging("generating templates", "templates generated", func() error {
