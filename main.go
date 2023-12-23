@@ -5,6 +5,7 @@ import (
 	"io/fs"
 	"os"
 	"os/exec"
+	"strings"
 )
 
 func performStepWithLogging(loadingMsg, completeMsg string, step func() error) {
@@ -61,14 +62,54 @@ func createProject(pName, mName string) {
 
 	// TODO: run templ generate
 
-	// TODO: setup tailwind
+	// setup tailwind
+	performStepWithLogging("installing tailwind", "tailwind installed", func() error {
+		return exec.Command("npm", "install", "-D", "tailwindcss").Run()
+	})
 
-	// TODO: setup air
+	performStepWithLogging("initializing tailwind", "tailwind initialized", func() error {
+		return exec.Command("npx", "tailwindcss", "init").Run()
+	})
+
+	performStepWithLogging("configure tailwind", "tailwind configured", func() error {
+		f, err := os.ReadFile("tailwind.config.js")
+		if err != nil {
+			return err
+		}
+		fStr := string(f)
+		fStr = strings.Replace(fStr, "content: []", "content: [\"./pkg/templates/**/*.templ\"]", 1)
+		err = os.WriteFile("tailwind.config.js", []byte(fStr), fs.ModePerm)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
+	performStepWithLogging("creating input css", "input css created", func() error {
+		f, err := os.Create("input.css")
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+		_, err = f.WriteString("@tailwind base;\n@tailwind components;\n@tailwind utilities;\n")
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
+	performStepWithLogging("generating tailwind css", "tailwind css generated", func() error {
+		return exec.Command("npx", "tailwindcss", "-i", "./input.css", "-o", "./public/tailwind.css", "--minify").Run()
+	})
+
+	// setup air
 	performStepWithLogging("initializing air", "air initialized", func() error {
 		return exec.Command("air", "init").Run()
 	})
 
-	// TODO: create .gitignore
+	// TODO: configure air
+
+	// create .gitignore
 	performStepWithLogging("creating gitignore", "gitignore created", func() error {
 		f, err := os.Create(".gitignore")
 		if err != nil {
