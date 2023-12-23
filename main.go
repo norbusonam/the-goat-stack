@@ -151,7 +151,10 @@ func createProject(pName, mName string) {
 		return nil
 	})
 
-	// TODO: run go mod tidy
+	// run go mod tidy
+	performStepWithLogging("tidying go modules", "go modules tidied", func() error {
+		return exec.Command("go", "mod", "tidy").Run()
+	})
 
 	// success message
 	fmt.Println()
