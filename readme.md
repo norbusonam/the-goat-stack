@@ -8,3 +8,15 @@
 - [**Go**](https://go.dev)
 - [**A**ir](https://github.com/cosmtrek/air)
 - [**T**ailwind](https://tailwindcss.com)
+
+## application architecture
+
+**Heavily** inspired by [templ's documentation](https://templ.guide/project-structure/project-structure#application-architecture) ❤️
+
+```mermaid
+graph TD;
+    main.go-->pkg/handlers;
+    pkg/handlers-->pkg/services;
+    pkg/handlers-->pkg/templates;
+    pkg/services-->pkg/db;
+```
