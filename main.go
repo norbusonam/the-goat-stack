@@ -52,6 +52,10 @@ func createProject(pName, mName string) {
 		return exec.Command("go", "mod", "init", mName).Run()
 	})
 
+	performStepWithLogging("initialize git", "git initialized", func() error {
+		return exec.Command("git", "init").Run()
+	})
+
 	performStepWithLogging("creating main.go", "main.go created", func() error {
 		f, err := os.Create("main.go")
 		if err != nil {
@@ -313,6 +317,7 @@ func main() {
 		checkPreReq("npm")
 		checkPreReq("npx")
 		checkPreReq("templ")
+		checkPreReq("git")
 		fmt.Println()
 		// create project
 		fmt.Println("creating project")
