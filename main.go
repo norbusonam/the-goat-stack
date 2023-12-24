@@ -61,7 +61,7 @@ func createProject(pName, mName string) {
 		mainGoContent := "package main\n"
 		mainGoContent += "\n"
 		mainGoContent += "import (\n"
-		mainGoContent += fmt.Sprintf("\t\"%s/pkg/templates\"\n", mName)
+		mainGoContent += fmt.Sprintf("\t\"%s/pkg/handlers\"\n", mName)
 		mainGoContent += "\n"
 		mainGoContent += "\t\"github.com/labstack/echo/v4\"\n"
 		mainGoContent += ")\n"
@@ -71,9 +71,7 @@ func createProject(pName, mName string) {
 		mainGoContent += "\n"
 		mainGoContent += "\te.Static(\"/\", \"public\")\n"
 		mainGoContent += "\n"
-		mainGoContent += "\te.GET(\"/\", func(c echo.Context) error {\n"
-		mainGoContent += "\t\treturn templates.Hello(\"world 🐐\").Render(c.Request().Context(), c.Response().Writer)\n"
-		mainGoContent += "\t})\n"
+		mainGoContent += "\te.GET(\"/\", handlers.Root)\n"
 		mainGoContent += "\n"
 		mainGoContent += "\te.Logger.Fatal(e.Start(\":8080\"))\n"
 		mainGoContent += "}\n"
@@ -133,6 +131,62 @@ func createProject(pName, mName string) {
 
 	performStepWithLogging("generating templates", "templates generated", func() error {
 		return exec.Command("templ", "generate").Run()
+	})
+
+	performStepWithLogging("creating handlers directory", "handlers directory created", func() error {
+		err := os.Mkdir("pkg/handlers", fs.ModePerm)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
+	performStepWithLogging("create services directory", "services directory created", func() error {
+		err := os.Mkdir("pkg/services", fs.ModePerm)
+		if err != nil {
+			return err
+		}
+		_, err = os.Create("pkg/services/.gitkeep")
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
+	performStepWithLogging("create db directory", "db directory created", func() error {
+		err := os.Mkdir("pkg/db", fs.ModePerm)
+		if err != nil {
+			return err
+		}
+		_, err = os.Create("pkg/db/.gitkeep")
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
+	performStepWithLogging("creating root.go", "root.go created", func() error {
+		f, err := os.Create("pkg/handlers/root.go")
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+		rootGoContent := "package handlers\n"
+		rootGoContent += "\n"
+		rootGoContent += "import (\n"
+		rootGoContent += fmt.Sprintf("\t\"%s/pkg/templates\"\n", mName)
+		rootGoContent += "\n"
+		rootGoContent += "\t\"github.com/labstack/echo/v4\"\n"
+		rootGoContent += ")\n"
+		rootGoContent += "\n"
+		rootGoContent += "func Root(c echo.Context) error {\n"
+		rootGoContent += "\treturn templates.Hello(\"world 🐐\").Render(c.Request().Context(), c.Response().Writer)\n"
+		rootGoContent += "}\n"
+		_, err = f.WriteString(rootGoContent)
+		if err != nil {
+			return err
+		}
+		return nil
 	})
 
 	performStepWithLogging("installing tailwind", "tailwind installed", func() error {

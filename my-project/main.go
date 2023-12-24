@@ -1,7 +1,7 @@
 package main
 
 import (
-	"my-module/pkg/templates"
+	"my-module/pkg/handlers"
 
 	"github.com/labstack/echo/v4"
 )
@@ -11,9 +11,7 @@ func main() {
 
 	e.Static("/", "public")
 
-	e.GET("/", func(c echo.Context) error {
-		return templates.Hello("world 🐐").Render(c.Request().Context(), c.Response().Writer)
-	})
+	e.GET("/", handlers.Root)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }
