@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"time"
 )
 
 const (
@@ -14,14 +15,31 @@ const (
 	patch = 0
 )
 
+func spinner(loadingMsg, completedMsg string, done chan bool) {
+	for {
+		select {
+		case <-done:
+			// clear line
+			fmt.Print("\r\033[K")
+			fmt.Println("✅ " + completedMsg)
+			return
+		default:
+			for _, r := range `-\|/` {
+				fmt.Printf("\r%c  %s", r, loadingMsg)
+				time.Sleep(100 * time.Millisecond)
+			}
+		}
+	}
+}
+
 func performStepWithLogging(loadingMsg, completeMsg string, step func() error) {
-	fmt.Println("⌛️ " + loadingMsg)
+	done := make(chan bool)
+	go spinner(loadingMsg, completeMsg, done)
 	err := step()
+	done <- true
 	if err != nil {
 		logErrorAndExit(err.Error())
 	}
-	fmt.Printf("\033[1A\033[K")
-	fmt.Println("✅ " + completeMsg)
 }
 
 func checkPreReq(cmd string) {
