@@ -121,7 +121,7 @@ func createProject(pName, mName string) {
 		indexTemplContent += "\t\t</head>\n"
 		indexTemplContent += "\t\t<body>\n"
 		indexTemplContent += "\t\t\t<div class=\"flex flex-col items-center justify-center h-screen\">\n"
-		indexTemplContent += "\t\t\t\t<h1 class=\"text-4xl font-bold text-gray-800\">Hello, {name}</h1>\n"
+		indexTemplContent += "\t\t\t\t<h1 class=\"text-4xl font-bold text-gray-800\">Hello, { name }</h1>\n"
 		indexTemplContent += "\t\t\t</div>\n"
 		indexTemplContent += "\t\t</body>\n"
 		indexTemplContent += "\t</html>\n"
@@ -277,6 +277,56 @@ func createProject(pName, mName string) {
 
 	performStepWithLogging("tidying go modules", "go modules tidied", func() error {
 		return exec.Command("go", "mod", "tidy").Run()
+	})
+
+	performStepWithLogging("creating .vscode directory", ".vscode directory created", func() error {
+		err := os.Mkdir(".vscode", fs.ModePerm)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
+	performStepWithLogging("configuring vscode settings", "vscode settings configured", func() error {
+		f, err := os.Create(".vscode/settings.json")
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+		settingsJSONContent := "{\n"
+		settingsJSONContent += "\t\"editor.formatOnSave\": true,\n"
+		settingsJSONContent += "\t\"[templ]\": {\n"
+		settingsJSONContent += "\t\t\"editor.defaultFormatter\": \"a-h.templ\"\n"
+		settingsJSONContent += "\t},\n"
+		settingsJSONContent += "\t\"tailwindCSS.includeLanguages\": {\n"
+		settingsJSONContent += "\t\t\"templ\": \"html\"\n"
+		settingsJSONContent += "\t}\n"
+		settingsJSONContent += "}\n"
+		_, err = f.WriteString(settingsJSONContent)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
+	performStepWithLogging("configuring vscode extensions", "vscode extensions configured", func() error {
+		f, err := os.Create(".vscode/extensions.json")
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+		extensionsJSONContent := "{\n"
+		extensionsJSONContent += "\t\"recommendations\": [\n"
+		extensionsJSONContent += "\t\t\"golang.go\",\n"
+		extensionsJSONContent += "\t\t\"a-h.templ\",\n"
+		extensionsJSONContent += "\t\t\"bradlc.vscode-tailwindcss\"\n"
+		extensionsJSONContent += "\t]\n"
+		extensionsJSONContent += "}\n"
+		_, err = f.WriteString(extensionsJSONContent)
+		if err != nil {
+			return err
+		}
+		return nil
 	})
 
 	fmt.Println()
