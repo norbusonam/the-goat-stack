@@ -40,20 +40,129 @@ func logErrorAndExit(err string) {
 }
 
 func createProject(pName, mName string) {
-	performStepWithLogging("creating project directory", "project directory created", func() error {
-		return os.Mkdir(pName, fs.ModePerm)
+	performStepWithLogging("creating project directories", "project directories created", func() error {
+		err := os.Mkdir(pName, fs.ModePerm)
+		if err != nil {
+			return err
+		}
+		err = os.Chdir(pName)
+		if err != nil {
+			return err
+		}
+		err = os.Mkdir("pkg", fs.ModePerm)
+		if err != nil {
+			return err
+		}
+		return nil
 	})
 
-	performStepWithLogging("changing directory", "directory changed", func() error {
-		return os.Chdir(pName)
-	})
-
-	performStepWithLogging("creating go module", "go module created", func() error {
+	performStepWithLogging("initializing go module", "go module initialized", func() error {
 		return exec.Command("go", "mod", "init", mName).Run()
 	})
 
-	performStepWithLogging("initialize git", "git initialized", func() error {
-		return exec.Command("git", "init").Run()
+	performStepWithLogging("setup git", "git setup", func() error {
+		err := exec.Command("git", "init").Run()
+		if err != nil {
+			return err
+		}
+		f, err := os.Create(".gitignore")
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+		_, err = f.WriteString("node_modules/\ntmp/\n*_templ.go\n")
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
+	performStepWithLogging("creating templates package", "templates package created", func() error {
+		err := os.Mkdir("pkg/templates", fs.ModePerm)
+		if err != nil {
+			return err
+		}
+
+		f, err := os.Create("pkg/templates/index.templ")
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+		indexTemplContent := "package templates\n"
+		indexTemplContent += "\n"
+		indexTemplContent += "templ Hello(name string) {\n"
+		indexTemplContent += "\t<!DOCTYPE html>\n"
+		indexTemplContent += "\t<html lang=\"en\">\n"
+		indexTemplContent += "\t\t<head>\n"
+		indexTemplContent += "\t\t\t<meta charset=\"UTF-8\"/>\n"
+		indexTemplContent += "\t\t\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>\n"
+		indexTemplContent += "\t\t\t<title>thegoat 🐐</title>\n"
+		indexTemplContent += "\t\t\t<link rel=\"stylesheet\" href=\"/tailwind.css\"/>\n"
+		indexTemplContent += "\t\t</head>\n"
+		indexTemplContent += "\t\t<body>\n"
+		indexTemplContent += "\t\t\t<div class=\"flex flex-col items-center justify-center h-screen\">\n"
+		indexTemplContent += "\t\t\t\t<h1 class=\"text-4xl font-bold text-gray-800\">Hello, { name }</h1>\n"
+		indexTemplContent += "\t\t\t</div>\n"
+		indexTemplContent += "\t\t</body>\n"
+		indexTemplContent += "\t</html>\n"
+		indexTemplContent += "}\n"
+		_, err = f.WriteString(indexTemplContent)
+		if err != nil {
+			return err
+		}
+		return exec.Command("templ", "generate").Run()
+	})
+
+	performStepWithLogging("creating handlers package", "handlers package created", func() error {
+		err := os.Mkdir("pkg/handlers", fs.ModePerm)
+		if err != nil {
+			return err
+		}
+		f, err := os.Create("pkg/handlers/root.go")
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+		rootGoContent := "package handlers\n"
+		rootGoContent += "\n"
+		rootGoContent += "import (\n"
+		rootGoContent += fmt.Sprintf("\t\"%s/pkg/templates\"\n", mName)
+		rootGoContent += "\n"
+		rootGoContent += "\t\"github.com/labstack/echo/v4\"\n"
+		rootGoContent += ")\n"
+		rootGoContent += "\n"
+		rootGoContent += "func Root(c echo.Context) error {\n"
+		rootGoContent += "\treturn templates.Hello(\"world 🐐\").Render(c.Request().Context(), c.Response().Writer)\n"
+		rootGoContent += "}\n"
+		_, err = f.WriteString(rootGoContent)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
+	performStepWithLogging("create services package", "services package created", func() error {
+		err := os.Mkdir("pkg/services", fs.ModePerm)
+		if err != nil {
+			return err
+		}
+		_, err = os.Create("pkg/services/.gitkeep")
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
+	performStepWithLogging("create db package", "db package created", func() error {
+		err := os.Mkdir("pkg/db", fs.ModePerm)
+		if err != nil {
+			return err
+		}
+		_, err = os.Create("pkg/db/.gitkeep")
+		if err != nil {
+			return err
+		}
+		return nil
 	})
 
 	performStepWithLogging("creating main.go", "main.go created", func() error {
@@ -86,157 +195,49 @@ func createProject(pName, mName string) {
 		return nil
 	})
 
-	performStepWithLogging("creating pkg directory", "pkg directory created", func() error {
-		err := os.Mkdir("pkg", fs.ModePerm)
-		if err != nil {
-			return err
-		}
-		return nil
+	performStepWithLogging("tidying go module", "go module tidied", func() error {
+		return exec.Command("go", "mod", "tidy").Run()
 	})
 
-	performStepWithLogging("creating templates directory", "templates directory created", func() error {
-		err := os.Mkdir("pkg/templates", fs.ModePerm)
+	performStepWithLogging("setup tailwind", "tailwind setup", func() error {
+		err := exec.Command("npm", "install", "-D", "tailwindcss").Run()
 		if err != nil {
 			return err
 		}
-		return nil
-	})
-
-	performStepWithLogging("creating index.templ", "index.templ created", func() error {
-		f, err := os.Create("pkg/templates/index.templ")
+		err = exec.Command("npx", "tailwindcss", "init").Run()
 		if err != nil {
 			return err
 		}
-		defer f.Close()
-		indexTemplContent := "package templates\n"
-		indexTemplContent += "\n"
-		indexTemplContent += "templ Hello(name string) {\n"
-		indexTemplContent += "\t<!DOCTYPE html>\n"
-		indexTemplContent += "\t<html lang=\"en\">\n"
-		indexTemplContent += "\t\t<head>\n"
-		indexTemplContent += "\t\t\t<meta charset=\"UTF-8\"/>\n"
-		indexTemplContent += "\t\t\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>\n"
-		indexTemplContent += "\t\t\t<title>thegoat 🐐</title>\n"
-		indexTemplContent += "\t\t\t<link rel=\"stylesheet\" href=\"/tailwind.css\"/>\n"
-		indexTemplContent += "\t\t</head>\n"
-		indexTemplContent += "\t\t<body>\n"
-		indexTemplContent += "\t\t\t<div class=\"flex flex-col items-center justify-center h-screen\">\n"
-		indexTemplContent += "\t\t\t\t<h1 class=\"text-4xl font-bold text-gray-800\">Hello, { name }</h1>\n"
-		indexTemplContent += "\t\t\t</div>\n"
-		indexTemplContent += "\t\t</body>\n"
-		indexTemplContent += "\t</html>\n"
-		indexTemplContent += "}\n"
-		_, err = f.WriteString(indexTemplContent)
+		// update tailwind.config.js
+		fConfig, err := os.ReadFile("tailwind.config.js")
 		if err != nil {
 			return err
 		}
-		return nil
-	})
-
-	performStepWithLogging("generating templates", "templates generated", func() error {
-		return exec.Command("templ", "generate").Run()
-	})
-
-	performStepWithLogging("creating handlers directory", "handlers directory created", func() error {
-		err := os.Mkdir("pkg/handlers", fs.ModePerm)
+		fConfigStr := string(fConfig)
+		fConfigStr = strings.Replace(fConfigStr, "content: []", "content: [\"./pkg/templates/**/*.templ\"]", 1)
+		err = os.WriteFile("tailwind.config.js", []byte(fConfigStr), fs.ModePerm)
 		if err != nil {
 			return err
 		}
-		return nil
-	})
-
-	performStepWithLogging("create services directory", "services directory created", func() error {
-		err := os.Mkdir("pkg/services", fs.ModePerm)
+		// create input.css
+		fInput, err := os.Create("input.css")
 		if err != nil {
 			return err
 		}
-		_, err = os.Create("pkg/services/.gitkeep")
+		defer fInput.Close()
+		_, err = fInput.WriteString("@tailwind base;\n@tailwind components;\n@tailwind utilities;\n")
 		if err != nil {
 			return err
 		}
-		return nil
-	})
-
-	performStepWithLogging("create db directory", "db directory created", func() error {
-		err := os.Mkdir("pkg/db", fs.ModePerm)
-		if err != nil {
-			return err
-		}
-		_, err = os.Create("pkg/db/.gitkeep")
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-
-	performStepWithLogging("creating root.go", "root.go created", func() error {
-		f, err := os.Create("pkg/handlers/root.go")
-		if err != nil {
-			return err
-		}
-		defer f.Close()
-		rootGoContent := "package handlers\n"
-		rootGoContent += "\n"
-		rootGoContent += "import (\n"
-		rootGoContent += fmt.Sprintf("\t\"%s/pkg/templates\"\n", mName)
-		rootGoContent += "\n"
-		rootGoContent += "\t\"github.com/labstack/echo/v4\"\n"
-		rootGoContent += ")\n"
-		rootGoContent += "\n"
-		rootGoContent += "func Root(c echo.Context) error {\n"
-		rootGoContent += "\treturn templates.Hello(\"world 🐐\").Render(c.Request().Context(), c.Response().Writer)\n"
-		rootGoContent += "}\n"
-		_, err = f.WriteString(rootGoContent)
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-
-	performStepWithLogging("installing tailwind", "tailwind installed", func() error {
-		return exec.Command("npm", "install", "-D", "tailwindcss").Run()
-	})
-
-	performStepWithLogging("initializing tailwind", "tailwind initialized", func() error {
-		return exec.Command("npx", "tailwindcss", "init").Run()
-	})
-
-	performStepWithLogging("configure tailwind", "tailwind configured", func() error {
-		f, err := os.ReadFile("tailwind.config.js")
-		if err != nil {
-			return err
-		}
-		fStr := string(f)
-		fStr = strings.Replace(fStr, "content: []", "content: [\"./pkg/templates/**/*.templ\"]", 1)
-		err = os.WriteFile("tailwind.config.js", []byte(fStr), fs.ModePerm)
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-
-	performStepWithLogging("creating input css", "input css created", func() error {
-		f, err := os.Create("input.css")
-		if err != nil {
-			return err
-		}
-		defer f.Close()
-		_, err = f.WriteString("@tailwind base;\n@tailwind components;\n@tailwind utilities;\n")
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-
-	performStepWithLogging("generating tailwind css", "tailwind css generated", func() error {
+		// generate tailwind css
 		return exec.Command("npx", "tailwindcss", "-i", "./input.css", "-o", "./public/tailwind.css", "--minify").Run()
 	})
 
-	performStepWithLogging("initializing air", "air initialized", func() error {
-		return exec.Command("air", "init").Run()
-	})
-
-	performStepWithLogging("configuring air", "air configured", func() error {
+	performStepWithLogging("setup air", "air setup", func() error {
+		err := exec.Command("air", "init").Run()
+		if err != nil {
+			return err
+		}
 		f, err := os.ReadFile(".air.toml")
 		if err != nil {
 			return err
@@ -262,37 +263,16 @@ func createProject(pName, mName string) {
 		return nil
 	})
 
-	performStepWithLogging("creating gitignore", "gitignore created", func() error {
-		f, err := os.Create(".gitignore")
-		if err != nil {
-			return err
-		}
-		defer f.Close()
-		_, err = f.WriteString("node_modules/\ntmp/\n*_templ.go\n")
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-
-	performStepWithLogging("tidying go modules", "go modules tidied", func() error {
-		return exec.Command("go", "mod", "tidy").Run()
-	})
-
-	performStepWithLogging("creating .vscode directory", ".vscode directory created", func() error {
+	performStepWithLogging("setup vscode", "vscode setup", func() error {
 		err := os.Mkdir(".vscode", fs.ModePerm)
 		if err != nil {
 			return err
 		}
-		return nil
-	})
-
-	performStepWithLogging("configuring vscode settings", "vscode settings configured", func() error {
-		f, err := os.Create(".vscode/settings.json")
+		fSettings, err := os.Create(".vscode/settings.json")
 		if err != nil {
 			return err
 		}
-		defer f.Close()
+		defer fSettings.Close()
 		settingsJSONContent := "{\n"
 		settingsJSONContent += "\t\"editor.formatOnSave\": true,\n"
 		settingsJSONContent += "\t\"[templ]\": {\n"
@@ -302,19 +282,15 @@ func createProject(pName, mName string) {
 		settingsJSONContent += "\t\t\"templ\": \"html\"\n"
 		settingsJSONContent += "\t}\n"
 		settingsJSONContent += "}\n"
-		_, err = f.WriteString(settingsJSONContent)
+		_, err = fSettings.WriteString(settingsJSONContent)
 		if err != nil {
 			return err
 		}
-		return nil
-	})
-
-	performStepWithLogging("configuring vscode extensions", "vscode extensions configured", func() error {
-		f, err := os.Create(".vscode/extensions.json")
+		fExt, err := os.Create(".vscode/extensions.json")
 		if err != nil {
 			return err
 		}
-		defer f.Close()
+		defer fExt.Close()
 		extensionsJSONContent := "{\n"
 		extensionsJSONContent += "\t\"recommendations\": [\n"
 		extensionsJSONContent += "\t\t\"golang.go\",\n"
@@ -322,7 +298,7 @@ func createProject(pName, mName string) {
 		extensionsJSONContent += "\t\t\"bradlc.vscode-tailwindcss\"\n"
 		extensionsJSONContent += "\t]\n"
 		extensionsJSONContent += "}\n"
-		_, err = f.WriteString(extensionsJSONContent)
+		_, err = fExt.WriteString(extensionsJSONContent)
 		if err != nil {
 			return err
 		}
