@@ -11,8 +11,15 @@ The Goat stack is a tech stack that uses the following technologies:
 
 ## Get Started
 
-1. Install the Goat CLI: `go install github.com/norbusonam/the-goat-stack/cmd/goat@latest`
-2. Create a new project: `goat new`
+Install the Goat CLI
+```
+go install github.com/norbusonam/the-goat-stack/cmd/goat@latest
+```
+
+Create a Goat project
+```
+goat new
+```
 
 ## Application Architecture
 
