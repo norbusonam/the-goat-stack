@@ -275,10 +275,10 @@ func createProject(pName, mName string) {
 		excludeRegexIdx := strings.Index(fStr, "exclude_regex")
 		insertIdx = strings.Index(fStr[excludeRegexIdx:], "]")
 		fStr = fStr[:excludeRegexIdx+insertIdx] + ", \"_templ.go\"" + fStr[excludeRegexIdx+insertIdx:]
-		// find include_ext list and append .templ
+		// find include_ext list and append templ
 		includeExtIdx := strings.Index(fStr, "include_ext")
 		insertIdx = strings.Index(fStr[includeExtIdx:], "]")
-		fStr = fStr[:includeExtIdx+insertIdx] + ", \".templ\"" + fStr[includeExtIdx+insertIdx:]
+		fStr = fStr[:includeExtIdx+insertIdx] + ", \"templ\"" + fStr[includeExtIdx+insertIdx:]
 		// write changes
 		err = os.WriteFile(".air.toml", []byte(fStr), fs.ModePerm)
 		if err != nil {
