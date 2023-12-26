@@ -79,7 +79,7 @@ func createProject(pName, mName string) {
 		return exec.Command("go", "mod", "init", mName).Run()
 	})
 
-	performStepWithLogging("setup git", "git setup", func() error {
+	performStepWithLogging("setting up git", "git set up", func() error {
 		err := exec.Command("git", "init").Run()
 		if err != nil {
 			return err
@@ -160,7 +160,7 @@ func createProject(pName, mName string) {
 		return nil
 	})
 
-	performStepWithLogging("create services package", "services package created", func() error {
+	performStepWithLogging("creating services package", "services package created", func() error {
 		err := os.Mkdir("pkg/services", fs.ModePerm)
 		if err != nil {
 			return err
@@ -172,7 +172,7 @@ func createProject(pName, mName string) {
 		return nil
 	})
 
-	performStepWithLogging("create db package", "db package created", func() error {
+	performStepWithLogging("creating db package", "db package created", func() error {
 		err := os.Mkdir("pkg/db", fs.ModePerm)
 		if err != nil {
 			return err
@@ -218,7 +218,7 @@ func createProject(pName, mName string) {
 		return exec.Command("go", "mod", "tidy").Run()
 	})
 
-	performStepWithLogging("setup tailwind", "tailwind setup", func() error {
+	performStepWithLogging("setting up tailwind", "tailwind set up", func() error {
 		err := exec.Command("npm", "install", "-D", "tailwindcss").Run()
 		if err != nil {
 			return err
@@ -252,7 +252,7 @@ func createProject(pName, mName string) {
 		return exec.Command("npx", "tailwindcss", "-i", "./input.css", "-o", "./public/tailwind.css", "--minify").Run()
 	})
 
-	performStepWithLogging("setup air", "air setup", func() error {
+	performStepWithLogging("setting up air", "air set up", func() error {
 		err := exec.Command("air", "init").Run()
 		if err != nil {
 			return err
@@ -282,7 +282,7 @@ func createProject(pName, mName string) {
 		return nil
 	})
 
-	performStepWithLogging("setup vscode", "vscode setup", func() error {
+	performStepWithLogging("setting up vscode", "vscode set up", func() error {
 		err := os.Mkdir(".vscode", fs.ModePerm)
 		if err != nil {
 			return err
