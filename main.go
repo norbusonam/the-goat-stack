@@ -54,6 +54,7 @@ func checkPreReq(cmd string) {
 
 func logErrorAndExit(err string) {
 	fmt.Println("❌ " + err)
+	fmt.Println("👉 thegoat help")
 	os.Exit(1)
 }
 
