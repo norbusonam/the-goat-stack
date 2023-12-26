@@ -263,6 +263,10 @@ func createProject(pName, mName string) {
 			return err
 		}
 		fStr := string(f)
+		// find cmd and add tailwind and templ steps
+		cmdIdx := strings.Index(fStr, "cmd")
+		cmdEndIdx := strings.Index(fStr[cmdIdx:], "\n")
+		fStr = fStr[:cmdIdx] + "cmd = \"npx tailwindcss -i ./input.css -o ./public/tailwind.css --minify && templ generate && go build -o ./tmp/main .\"" + fStr[cmdIdx+cmdEndIdx:]
 		// find exclude_dir list and append node_modules
 		excludeDirIdx := strings.Index(fStr, "exclude_dir")
 		insertIdx := strings.Index(fStr[excludeDirIdx:], "]")
