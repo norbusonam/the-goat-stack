@@ -1,6 +1,6 @@
-# thegoat 🐐
+# The Goat Stack 🐐
 
-**thegoat** is a tech stack that uses the following technologies:
+The Goat stack is a tech stack that uses the following technologies:
 
 - [**T**empl](https://templ.guide)
 - [**H**tmx](https://htmx.org)
@@ -9,7 +9,7 @@
 - [**A**ir](https://github.com/cosmtrek/air)
 - [**T**ailwind](https://tailwindcss.com)
 
-## application architecture
+## Application Architecture
 
 **Heavily** inspired by [templ's documentation](https://templ.guide/project-structure/project-structure#application-architecture) ❤️
 

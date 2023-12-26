@@ -54,7 +54,7 @@ func checkPreReq(cmd string) {
 
 func logErrorAndExit(err string) {
 	fmt.Println("❌ " + err)
-	fmt.Println("👉 thegoat help")
+	fmt.Println("👉 goat help")
 	os.Exit(1)
 }
 
@@ -115,7 +115,7 @@ func createProject(pName, mName string) {
 		indexTemplContent += "\t\t<head>\n"
 		indexTemplContent += "\t\t\t<meta charset=\"UTF-8\"/>\n"
 		indexTemplContent += "\t\t\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>\n"
-		indexTemplContent += "\t\t\t<title>thegoat 🐐</title>\n"
+		indexTemplContent += "\t\t\t<title>The Goat Stack</title>\n"
 		indexTemplContent += "\t\t\t<link rel=\"stylesheet\" href=\"/tailwind.css\"/>\n"
 		indexTemplContent += "\t\t</head>\n"
 		indexTemplContent += "\t\t<body>\n"
@@ -331,7 +331,7 @@ func createProject(pName, mName string) {
 }
 
 func main() {
-	fmt.Print("thegoat 🐐\n\n")
+	fmt.Print("The Goat Stack 🐐\n\n")
 
 	if len(os.Args) > 2 {
 		logErrorAndExit("too many arguments")
@@ -368,7 +368,7 @@ func main() {
 		fmt.Println("creating project")
 		createProject(pName, mName)
 	case "help":
-		fmt.Println("usage: thegoat <command>")
+		fmt.Println("usage: goat <command>")
 		fmt.Println("commands:")
 		fmt.Println("  new\t\tcreate a new project")
 		fmt.Println("  help\t\tshow this help message")
