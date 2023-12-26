@@ -117,6 +117,7 @@ func createProject(pName, mName string) {
 		indexTemplContent += "\t\t\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>\n"
 		indexTemplContent += "\t\t\t<title>The Goat Stack</title>\n"
 		indexTemplContent += "\t\t\t<link rel=\"stylesheet\" href=\"/tailwind.css\"/>\n"
+		indexTemplContent += "\t\t\t<script src=\"https://unpkg.com/htmx.org@1.9.10\" integrity=\"sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC\" crossorigin=\"anonymous\"></script>\n"
 		indexTemplContent += "\t\t</head>\n"
 		indexTemplContent += "\t\t<body>\n"
 		indexTemplContent += "\t\t\t<div class=\"flex flex-col items-center justify-center h-screen\">\n"
