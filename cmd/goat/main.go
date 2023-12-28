@@ -43,7 +43,7 @@ func performStepWithLogging(loadingMsg, completeMsg string, step func() error) {
 }
 
 func checkPreReq(cmd string) {
-	performStepWithLogging("checking if "+cmd+" is installed", cmd+" is installed", func() error {
+	performStepWithLogging("Checking if "+cmd+" is installed", cmd+" is installed", func() error {
 		_, err := exec.LookPath(cmd)
 		if err != nil {
 			return err
@@ -59,7 +59,7 @@ func logErrorAndExit(err string) {
 }
 
 func createProject(pName, mName string) {
-	performStepWithLogging("creating project directories", "project directories created", func() error {
+	performStepWithLogging("Creating project directories", "Project directories created", func() error {
 		err := os.Mkdir(pName, fs.ModePerm)
 		if err != nil {
 			return err
@@ -75,11 +75,11 @@ func createProject(pName, mName string) {
 		return nil
 	})
 
-	performStepWithLogging("initializing go module", "go module initialized", func() error {
+	performStepWithLogging("Initializing Go module", "Go module initialized", func() error {
 		return exec.Command("go", "mod", "init", mName).Run()
 	})
 
-	performStepWithLogging("setting up git", "git set up", func() error {
+	performStepWithLogging("Setting up Git", "Git set up", func() error {
 		err := exec.Command("git", "init").Run()
 		if err != nil {
 			return err
@@ -96,7 +96,7 @@ func createProject(pName, mName string) {
 		return nil
 	})
 
-	performStepWithLogging("creating templates package", "templates package created", func() error {
+	performStepWithLogging("Creating templates package", "templates package created", func() error {
 		err := os.Mkdir("pkg/templates", fs.ModePerm)
 		if err != nil {
 			return err
@@ -133,7 +133,7 @@ func createProject(pName, mName string) {
 		return exec.Command("templ", "generate").Run()
 	})
 
-	performStepWithLogging("creating handlers package", "handlers package created", func() error {
+	performStepWithLogging("Creating handlers package", "handlers package created", func() error {
 		err := os.Mkdir("pkg/handlers", fs.ModePerm)
 		if err != nil {
 			return err
@@ -161,7 +161,7 @@ func createProject(pName, mName string) {
 		return nil
 	})
 
-	performStepWithLogging("creating services package", "services package created", func() error {
+	performStepWithLogging("Creating services package", "services package created", func() error {
 		err := os.Mkdir("pkg/services", fs.ModePerm)
 		if err != nil {
 			return err
@@ -173,7 +173,7 @@ func createProject(pName, mName string) {
 		return nil
 	})
 
-	performStepWithLogging("creating db package", "db package created", func() error {
+	performStepWithLogging("Creating db package", "db package created", func() error {
 		err := os.Mkdir("pkg/db", fs.ModePerm)
 		if err != nil {
 			return err
@@ -185,7 +185,7 @@ func createProject(pName, mName string) {
 		return nil
 	})
 
-	performStepWithLogging("creating main.go", "main.go created", func() error {
+	performStepWithLogging("Creating main.go", "main.go created", func() error {
 		f, err := os.Create("main.go")
 		if err != nil {
 			return err
@@ -215,11 +215,11 @@ func createProject(pName, mName string) {
 		return nil
 	})
 
-	performStepWithLogging("tidying go module", "go module tidied", func() error {
+	performStepWithLogging("Tidying Go module", "Go module tidied", func() error {
 		return exec.Command("go", "mod", "tidy").Run()
 	})
 
-	performStepWithLogging("setting up tailwind", "tailwind set up", func() error {
+	performStepWithLogging("Setting up Tailwind", "Tailwind set up", func() error {
 		err := exec.Command("npm", "install", "-D", "tailwindcss").Run()
 		if err != nil {
 			return err
@@ -253,7 +253,7 @@ func createProject(pName, mName string) {
 		return exec.Command("npx", "tailwindcss", "-i", "./input.css", "-o", "./public/tailwind.css", "--minify").Run()
 	})
 
-	performStepWithLogging("setting up air", "air set up", func() error {
+	performStepWithLogging("Setting up Air", "Air set up", func() error {
 		err := exec.Command("air", "init").Run()
 		if err != nil {
 			return err
@@ -287,7 +287,7 @@ func createProject(pName, mName string) {
 		return nil
 	})
 
-	performStepWithLogging("setting up vscode", "vscode set up", func() error {
+	performStepWithLogging("Setting up VS Code", "VS Code set up", func() error {
 		err := os.Mkdir(".vscode", fs.ModePerm)
 		if err != nil {
 			return err
@@ -330,7 +330,7 @@ func createProject(pName, mName string) {
 	})
 
 	fmt.Println()
-	fmt.Println("🎉 project created successfully")
+	fmt.Println("🎉 Project created successfully")
 	fmt.Println("👉 cd " + pName)
 	fmt.Println("👉 air")
 }
@@ -339,21 +339,21 @@ func main() {
 	fmt.Print("The Goat Stack 🐐\n\n")
 
 	if len(os.Args) > 2 {
-		logErrorAndExit("too many arguments")
+		logErrorAndExit("Too many arguments")
 	} else if len(os.Args) < 2 {
-		logErrorAndExit("not enough arguments")
+		logErrorAndExit("Not enough arguments")
 	}
 
 	switch os.Args[1] {
 	case "new":
 		// get project name and module name
-		fmt.Print("project name (default: my-project): ")
+		fmt.Print("Project name (default: my-project): ")
 		var pName string
 		fmt.Scanln(&pName)
 		if pName == "" {
 			pName = "my-project"
 		}
-		fmt.Print("module name (default my-module): ")
+		fmt.Print("Module name (default: my-module): ")
 		var mName string
 		fmt.Scanln(&mName)
 		fmt.Println()
@@ -361,7 +361,7 @@ func main() {
 			mName = "my-module"
 		}
 		// check prerequisites
-		fmt.Println("checking prerequisites")
+		fmt.Println("Checking prerequisites:")
 		checkPreReq("go")
 		checkPreReq("air")
 		checkPreReq("npm")
@@ -370,17 +370,17 @@ func main() {
 		checkPreReq("git")
 		fmt.Println()
 		// create project
-		fmt.Println("creating project")
+		fmt.Println("Creating project:")
 		createProject(pName, mName)
 	case "help":
-		fmt.Println("usage: goat <command>")
-		fmt.Println("commands:")
+		fmt.Println("Usage: goat <command>")
+		fmt.Println("Commands:")
 		fmt.Println("  new\t\tcreate a new project")
 		fmt.Println("  help\t\tshow this help message")
 		fmt.Println("  version\tshow version information")
 	case "version":
 		fmt.Printf("v%d.%d.%d\n", major, minor, patch)
 	default:
-		logErrorAndExit("invalid command")
+		logErrorAndExit("Invalid command")
 	}
 }
