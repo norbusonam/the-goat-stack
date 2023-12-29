@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"my-module/pkg/templates"
+	"goat-module/pkg/templates"
 
 	"github.com/labstack/echo/v4"
 )

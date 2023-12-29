@@ -1,7 +1,7 @@
 package main
 
 import (
-	"my-module/pkg/handlers"
+	"goat-module/pkg/handlers"
 
 	"github.com/labstack/echo/v4"
 )

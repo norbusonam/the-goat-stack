@@ -1,4 +1,4 @@
-module my-module
+module goat-module
 
 go 1.21.3
 
