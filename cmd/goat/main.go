@@ -58,7 +58,7 @@ func logErrorAndExit(err string) {
 	os.Exit(1)
 }
 
-func createProject(pName, mName string) {
+func createProject(pName, mName string, usingVscode bool) {
 	performStepWithLogging("Creating project directories", "Project directories created", func() error {
 		err := os.Mkdir(pName, fs.ModePerm)
 		if err != nil {
@@ -287,47 +287,49 @@ func createProject(pName, mName string) {
 		return nil
 	})
 
-	performStepWithLogging("Setting up VS Code", "VS Code set up", func() error {
-		err := os.Mkdir(".vscode", fs.ModePerm)
-		if err != nil {
-			return err
-		}
-		fSettings, err := os.Create(".vscode/settings.json")
-		if err != nil {
-			return err
-		}
-		defer fSettings.Close()
-		settingsJSONContent := "{\n"
-		settingsJSONContent += "\t\"editor.formatOnSave\": true,\n"
-		settingsJSONContent += "\t\"[templ]\": {\n"
-		settingsJSONContent += "\t\t\"editor.defaultFormatter\": \"a-h.templ\"\n"
-		settingsJSONContent += "\t},\n"
-		settingsJSONContent += "\t\"tailwindCSS.includeLanguages\": {\n"
-		settingsJSONContent += "\t\t\"templ\": \"html\"\n"
-		settingsJSONContent += "\t}\n"
-		settingsJSONContent += "}\n"
-		_, err = fSettings.WriteString(settingsJSONContent)
-		if err != nil {
-			return err
-		}
-		fExt, err := os.Create(".vscode/extensions.json")
-		if err != nil {
-			return err
-		}
-		defer fExt.Close()
-		extensionsJSONContent := "{\n"
-		extensionsJSONContent += "\t\"recommendations\": [\n"
-		extensionsJSONContent += "\t\t\"golang.go\",\n"
-		extensionsJSONContent += "\t\t\"a-h.templ\",\n"
-		extensionsJSONContent += "\t\t\"bradlc.vscode-tailwindcss\"\n"
-		extensionsJSONContent += "\t]\n"
-		extensionsJSONContent += "}\n"
-		_, err = fExt.WriteString(extensionsJSONContent)
-		if err != nil {
-			return err
-		}
-		return nil
-	})
+	if usingVscode {
+		performStepWithLogging("Setting up VS Code", "VS Code set up", func() error {
+			err := os.Mkdir(".vscode", fs.ModePerm)
+			if err != nil {
+				return err
+			}
+			fSettings, err := os.Create(".vscode/settings.json")
+			if err != nil {
+				return err
+			}
+			defer fSettings.Close()
+			settingsJSONContent := "{\n"
+			settingsJSONContent += "\t\"editor.formatOnSave\": true,\n"
+			settingsJSONContent += "\t\"[templ]\": {\n"
+			settingsJSONContent += "\t\t\"editor.defaultFormatter\": \"a-h.templ\"\n"
+			settingsJSONContent += "\t},\n"
+			settingsJSONContent += "\t\"tailwindCSS.includeLanguages\": {\n"
+			settingsJSONContent += "\t\t\"templ\": \"html\"\n"
+			settingsJSONContent += "\t}\n"
+			settingsJSONContent += "}\n"
+			_, err = fSettings.WriteString(settingsJSONContent)
+			if err != nil {
+				return err
+			}
+			fExt, err := os.Create(".vscode/extensions.json")
+			if err != nil {
+				return err
+			}
+			defer fExt.Close()
+			extensionsJSONContent := "{\n"
+			extensionsJSONContent += "\t\"recommendations\": [\n"
+			extensionsJSONContent += "\t\t\"golang.go\",\n"
+			extensionsJSONContent += "\t\t\"a-h.templ\",\n"
+			extensionsJSONContent += "\t\t\"bradlc.vscode-tailwindcss\"\n"
+			extensionsJSONContent += "\t]\n"
+			extensionsJSONContent += "}\n"
+			_, err = fExt.WriteString(extensionsJSONContent)
+			if err != nil {
+				return err
+			}
+			return nil
+		})
+	}
 
 	fmt.Println()
 	fmt.Println("🎉 Project created successfully")
@@ -356,10 +358,15 @@ func main() {
 		fmt.Print("Module name (default: my-module): ")
 		var mName string
 		fmt.Scanln(&mName)
-		fmt.Println()
 		if mName == "" {
 			mName = "my-module"
 		}
+		var vscodeRes string
+		var usingVscode bool
+		fmt.Print("Are you using VS Code? (y/n): ")
+		fmt.Scanln(&vscodeRes)
+		fmt.Println()
+		usingVscode = vscodeRes == "y" || vscodeRes == "Y"
 		// check prerequisites
 		fmt.Println("Checking prerequisites:")
 		checkPreReq("go")
@@ -371,7 +378,7 @@ func main() {
 		fmt.Println()
 		// create project
 		fmt.Println("Creating project:")
-		createProject(pName, mName)
+		createProject(pName, mName, usingVscode)
 	case "help":
 		fmt.Println("Usage: goat <command>")
 		fmt.Println("Commands:")
