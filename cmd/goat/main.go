@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -34,9 +35,15 @@ func spinner(loadingMsg, completedMsg string, done chan bool) {
 
 func performStepWithLogging(loadingMsg, completeMsg string, step func() error) {
 	done := make(chan bool)
-	go spinner(loadingMsg, completeMsg, done)
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		spinner(loadingMsg, completeMsg, done)
+	}()
 	err := step()
 	done <- true
+	wg.Wait()
 	if err != nil {
 		logErrorAndExit(err.Error())
 	}
